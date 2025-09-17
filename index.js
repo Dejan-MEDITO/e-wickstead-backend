@@ -89,7 +89,7 @@ app.post('/api/inventory-check', async (req, res) => {
 
     const stockData = await stockResp.json();
     const available = stockData?.data?.inventoryLevel?.available ?? 0;
-    console.log(available);
+    console.log(stockData, "stockData");
     res.json({ inStockAtUS: available > 0 });
   } catch (err) {
     console.error('Error in /api/inventory-check:', err);
