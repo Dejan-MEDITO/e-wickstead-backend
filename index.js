@@ -62,15 +62,29 @@ app.post('/api/inventory-check', async (req, res) => {
     const variantData = await variantResp.json();
     const inventoryItemId = variantData?.data?.productVariant?.inventoryItem?.id;
     console.log(variantData, "variantData");
+    console.log(inventoryItemId, "inventoryItemId");
     if (!inventoryItemId) {
       return res.json({ inStockAtUS: false });
     }
 
-    // Step 2: check stock at US location
+    // Step 2: check stock at US location using inventoryItem query
     const queryStock = `
-      query($itemId: ID!, $locationId: ID!) {
-        inventoryLevel(inventoryItemId: $itemId, locationId: $locationId) {
-          available
+      query($itemId: ID!) {
+        inventoryItem(id: $itemId) {
+          inventoryLevels(first: 10) {
+            edges {
+              node {
+                location {
+                  id
+                  name
+                }
+                quantities(names: ["available"]) {
+                  name
+                  quantity
+                }
+              }
+            }
+          }
         }
       }
     `;
@@ -83,13 +97,27 @@ app.post('/api/inventory-check', async (req, res) => {
       },
       body: JSON.stringify({
         query: queryStock,
-        variables: { itemId: inventoryItemId, locationId: US_LOCATION_ID },
+        variables: { itemId: inventoryItemId },
       }),
     });
 
     const stockData = await stockResp.json();
-    const available = stockData?.data?.inventoryLevel?.available ?? 0;
     console.log(stockData, "stockData");
+    
+    // Find the inventory level for the US location
+    const inventoryLevels = stockData?.data?.inventoryItem?.inventoryLevels?.edges || [];
+    const usLocation = inventoryLevels.find(edge => 
+      edge.node.location.id === US_LOCATION_ID
+    );
+    
+    // Get the available quantity for the US location
+    let available = 0;
+    if (usLocation) {
+      const availableQuantity = usLocation.node.quantities.find(q => q.name === 'available');
+      available = availableQuantity ? availableQuantity.quantity : 0;
+    }
+    
+    console.log(`Available quantity at US location: ${available}`);
     res.json({ inStockAtUS: available > 0 });
   } catch (err) {
     console.error('Error in /api/inventory-check:', err);
