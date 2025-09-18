@@ -28,7 +28,7 @@ if (!SHOPIFY_ACCESS_TOKEN) {
 }
 
 // 👇 IMPORTANT: replace with the US location ID you want to check
-const US_LOCATION_ID = "gid://shopify/Location/109329482050";
+const US_LOCATION_ID = "gid://shopify/Location/82271371501";
 
 app.post('/api/inventory-check', async (req, res) => {
   try {
