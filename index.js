@@ -18,7 +18,7 @@ app.use(express.json());
 
 // replace with your private app token or server-side app session token
 const SHOPIFY_ACCESS_TOKEN = process.env.SHOPIFY_ADMIN_API_TOKEN;
-const SHOP = "medito-dev.myshopify.com";
+const SHOP = "e-wickstead.myshopify.com";
 
 // Check if required environment variables are set
 if (!SHOPIFY_ACCESS_TOKEN) {
