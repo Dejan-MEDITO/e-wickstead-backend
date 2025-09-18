@@ -59,6 +59,9 @@ app.post('/api/inventory-check', async (req, res) => {
       body: JSON.stringify({ query: queryVariant, variables: { id: variantId } }),
     });
 
+    console.log(SHOPIFY_ACCESS_TOKEN, "SHOPIFY_ACCESS_TOKEN");
+    console.log(SHOP, "SHOP");
+
     const variantData = await variantResp.json();
     const inventoryItemId = variantData?.data?.productVariant?.inventoryItem?.id;
     console.log(variantData, "variantData");
